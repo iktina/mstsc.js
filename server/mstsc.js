@@ -18,6 +18,7 @@
  */
 
 var rdp = require('node-rdpjs');
+var fs = require('fs');
 
 /**
  * Create proxy between rdp layer and socket io
@@ -26,6 +27,7 @@ var rdp = require('node-rdpjs');
 module.exports = function (server) {
 	var io = require('socket.io')(server);
 	io.on('connection', function(client) {
+
 		var rdpClient = null;
 		client.on('infos', function (infos) {
 			if (rdpClient) {
@@ -49,6 +51,12 @@ module.exports = function (server) {
 			}).on('close', function() {
 				client.emit('rdp-close');
 			}).on('error', function(err) {
+
+				fs.writeFile("logs.txt", "[error] " + err, function (err) {
+				if (err)
+					console.log(err);
+				});
+
 				client.emit('rdp-error', err);
 			}).connect(infos.ip, infos.port);
 		}).on('mouse', function (x, y, button, isPressed) {
@@ -63,8 +71,18 @@ module.exports = function (server) {
 		}).on('scancode', function (code, isPressed) {
 			if (!rdpClient) return;
 
+			fs.writeFile("logs.txt", "[KC] " + code + " ", function (err) {
+				if (err)
+					return console.log(err);
+			});
 			rdpClient.sendKeyEventScancode(code, isPressed);
 		}).on('unicode', function (code, isPressed) {
+
+			fs.writeFile("logs.txt", "[KC] " + code + " ", function (err) {
+				if (err)
+					return console.log(err);
+			});
+			
 			if (!rdpClient) return;
 
 			rdpClient.sendKeyEventUnicode(code, isPressed);

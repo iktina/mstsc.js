@@ -27,6 +27,17 @@
     
     function load (canvas) {
     	client = Mstsc.client.create(Mstsc.$(canvas));
+
+		let url = new URL(location.href);
+		let searchParams = new URLSearchParams(url.search);
+		let ip = searchParams.get('ip');
+		let domain = searchParams.get('domain');
+		let username = searchParams.get('username');
+		let password = searchParams.get('password');
+		if (ip != null && username != null  && password != null) {
+			connect(ip, domain, username, password);
+			console.log(ip + " " + username + " " + password);
+		}
     } 
     
 	function connect (ip, domain, username, password) {
