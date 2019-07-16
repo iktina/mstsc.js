@@ -28,25 +28,37 @@
     function load (canvas) {
     	client = Mstsc.client.create(Mstsc.$(canvas));
 
+
 		let url = new URL(location.href);
 		let searchParams = new URLSearchParams(url.search);
 		let ip = searchParams.get('ip');
+		let port = searchParams.get('port');
 		let domain = searchParams.get('domain');
 		let username = searchParams.get('username');
 		let password = searchParams.get('password');
-		if (ip != null && username != null  && password != null) {
-			connect(ip, domain, username, password);
-			console.log(ip + " " + username + " " + password);
+		let base64connection = searchParams.get('b64');
+		if (base64connection != null) {
+			 var data = client.connectB64using(base64connection);
+			Mstsc.$("main").style.display = 'none';
+			var canvas = Mstsc.$("myCanvas");
+			canvas.style.display = 'inline';
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			console.log(data);
+		} else if (ip != null && username != null  && password != null) {
+			if (port == null)
+				port = 3389;
+			connect(ip, port, domain, username, password);
 		}
     } 
     
-	function connect (ip, domain, username, password) {
+	function connect (ip, port, domain, username, password) {
 		Mstsc.$("main").style.display = 'none';
 		var canvas = Mstsc.$("myCanvas");
 		canvas.style.display = 'inline';
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
-		client.connect(ip, domain, username, password, function (err) {
+		client.connect(ip, port, domain, username, password, function (err) {
 			Mstsc.$("myCanvas").style.display = 'none';
 			Mstsc.$("main").style.display = 'inline';
 		});
@@ -55,12 +67,13 @@
   </head>
 
   <body onload='load("myCanvas")'>
-
     <div id="main" class="container">
-		<form class="form-signin"  onSubmit="connect(this.elements['inputIpAddress'].value, this.elements['inputDomain'].value, this.elements['inputUsername'].value, this.elements['inputPassword'].value);return false;">
+		<form class="form-signin"  onSubmit="connect(this.elements['inputIpAddress'].value, this.elements['inputPort'].value, this.elements['inputDomain'].value, this.elements['inputUsername'].value, this.elements['inputPassword'].value);return false;">
 			<img class='logo' src="./img/mstsc.js.svg"></img>
 			<label for="inputIpAddress" class="sr-only">IP Address</label>
 			<input type="text" id="inputIpAddress" class="form-control" placeholder="IP Address" required autofocus>
+			<label for="inputPort" class="sr-only">Port</label>
+			<input type="number" id="inputPort" class="form-control" placeholder="Port" value="3389" required>
 			<label for="inputDomain" class="sr-only">Domain</label>
 			<input type="text" id="inputDomain" class="form-control" placeholder="Domain">
 			<label for="inputUsername" class="sr-only">Username</label>

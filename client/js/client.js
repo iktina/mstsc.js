@@ -129,15 +129,36 @@
 			
 			return this;
 		},
+
+		/*
+		* connectB64using
+		* @param b64string {string} encoded target information
+		*/
+		connectB64using : function(b64string) {
+			var parts = document.location.pathname.split('/')
+		      , base = parts.slice(0, parts.length - 1).join('/') + '/'
+		      , path = base + 'socket.io';
+			var self = this;
+			this.socket = io(window.location.protocol + "//" + window.location.host, { "path": path })
+			.on('rdp-data-connection', function(data) {
+				console.log(data);
+				connect(data.ip, data.port, data.username, data.password)
+			});
+
+			this.socket.emit('b64use', {
+				b64: b64string
+			});
+		},
 		/**
 		 * connect
 		 * @param ip {string} ip target for rdp
+		 * @param port {int} port target server
 		 * @param domain {string} microsoft domain
 		 * @param username {string} session username
 		 * @param password {string} session password
 		 * @param next {function} asynchrone end callback
 		 */
-		connect : function (ip, domain, username, password, next) {
+		connect : function (ip, port, domain, username, password, next) {
 			// compute socket.io path (cozy cloud integration)
 			var parts = document.location.pathname.split('/')
 		      , base = parts.slice(0, parts.length - 1).join('/') + '/'
@@ -166,7 +187,7 @@
 			// emit infos event
 			this.socket.emit('infos', {
 				ip : ip, 
-				port : 3389, 
+				port : port, 
 				screen : { 
 					width : this.canvas.width, 
 					height : this.canvas.height 

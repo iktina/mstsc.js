@@ -17,8 +17,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var rdp = require('node-rdpjs');
-var fs = require('fs');
+var rdp 	= require('node-rdpjs');
+var fs 		= require('fs');
+var mysql 	= require('mysql');
+
+
 
 /**
  * Create proxy between rdp layer and socket io
@@ -29,7 +32,36 @@ module.exports = function (server) {
 	io.on('connection', function(client) {
 
 		var rdpClient = null;
+		client.on('b64use', function(b64) {
+			var buf = Buffer.from(b64.b64, 'base64');
+			let incomingPacket = JSON.parse(buf.toString('utf-8'))
+			console.log(incomingPacket);
+			console.log(incomingPacket.targets.eids[0]);
+			console.log(incomingPacket.targets.store);
+			var connection = mysql.createConnection({
+				host: 'localhost',
+				user: 'testUser',
+				password: 'testPassword',
+				database: 'nodejspractice'
+			});
+			connection.connect();
+			connection.query("SELECT * FROM equipments WHERE id = ?", incomingPacket.targets.eids, function(error, results, fields) {
+				console.log(error);
+				console.log(results);
+				if (null != results) {
+					console.log(results[0].host + ":" + results[0].port + " " + results[0].username + " " + results[0].password);
+					client.emit('rdp-data-connection', {
+						ip: results[0].host,
+						port: results[0].port,
+						username: results[0].username,
+						password: results[0].password
+					});
+				}
+			});
+
+		});
 		client.on('infos', function (infos) {
+			console.log(infos);
 			if (rdpClient) {
 				// clean older connection
 				rdpClient.close();

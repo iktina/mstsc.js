@@ -48,3 +48,8 @@ The frontend application uses socket.io and canvas for binding with mstsc.js bac
 The backend application uses nodejs, express and socket.io as the web server. The main goal of the backend is to be a proxy between the web browser and the terminal server. It uses [**node-rdpjs**](https://github.com/citronneur/node-rdpjs) for its rdp client.
 
 
+
+## The purpose of this fork
+
+1. Init connect by get parametrs
+2. Init connect by params from db.
