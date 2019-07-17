@@ -53,3 +53,25 @@ The backend application uses nodejs, express and socket.io as the web server. Th
 
 1. Init connect by get parametrs
 2. Init connect by params from db.
+
+## Configuration
+file server/mstsc.js lines 41 - 45 DB connection data
+
+```
+Get params:
+?b64= - base64 encoded json packet
+
+Get params:
+ip= connect to ip
+port = using this port
+domain = usung this domain
+username = using this username
+password = using this password
+
+```
+### Example
+localhost:9925?ip=<ip>&port=<port>&username=<username>&password=<password>
+
+or
+
+localhost:9925?b64=<base_64_encoded_string>
